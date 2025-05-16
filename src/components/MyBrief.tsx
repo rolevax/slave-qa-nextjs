@@ -2,7 +2,9 @@ import { Box, Typography } from "@mui/material";
 
 export default function MyBrief() {
     return (
-        <Box justifyContent="center" alignContent="center">
+        <Box display="flex"
+            justifyContent="center"
+            alignItems="center">
             <Typography>my info</Typography>
         </Box>
     );
