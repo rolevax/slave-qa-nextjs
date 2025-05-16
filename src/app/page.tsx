@@ -1,12 +1,14 @@
-import * as React from 'react';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import NextLink from 'next/link';
-import { AppBar, Button, IconButton, Toolbar } from '@mui/material';
-import { Menu } from '@mui/icons-material';
-import MyBrief from '../components/MyBrief';
-import MarketList from '@/components/MarketList';
+"use client";
+
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import NextLink from "next/link";
+import { AppBar, Button, IconButton, Tab, Tabs, Toolbar } from "@mui/material";
+import { Menu } from "@mui/icons-material";
+import SlaveBrief from "../components/SlaveBrief";
+import MarketList from "@/components/MarketList";
+import { useState } from "react";
 
 export default function Home() {
   return (
@@ -33,7 +35,7 @@ function HomeAppBar() {
           <Menu />
         </IconButton>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Market
+          Slave Q&A
         </Typography>
         <Button component={NextLink} href="/about">
           About
@@ -45,10 +47,22 @@ function HomeAppBar() {
 }
 
 function HomeBody() {
+  const [value, setValue] = useState(0);
+  const tabContent = [<MarketList />, <MarketList />][value];
   return (
     <Box>
-      <MyBrief />
-      <MarketList />
+      <SlaveBrief showSlavePageButton={true} />
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Tabs
+          value={value}
+          onChange={(e, v) => setValue(v)}
+          aria-label="basic tabs example"
+        >
+          <Tab label="My Slaves" />
+          <Tab label="Slave Market" />
+        </Tabs>
+      </Box>
+      {tabContent}
     </Box>
   );
 }
