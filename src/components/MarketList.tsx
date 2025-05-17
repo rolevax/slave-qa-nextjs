@@ -1,11 +1,13 @@
 import { shortAddr } from "@/util";
 import {
   Box,
+  Grid,
   List,
   ListItem,
   ListItemAvatar,
   ListItemButton,
   ListItemText,
+  Skeleton,
   Typography,
 } from "@mui/material";
 
@@ -21,23 +23,32 @@ export default function MarketList(props: {
       content: string;
       price: bigint;
     }[];
-  }[]
+  }[];
 }) {
   let items = [];
   for (let slave of props.slaves) {
     items.push(
-      <ListItem key={slave.self}>
+      <Grid key={slave.self} size={4}>
         <ListItemButton href={`/slave/${slave.self}`}>
-          <ListItemAvatar>N</ListItemAvatar>
-          <ListItemText primary={shortAddr(slave.self)} secondary={slave.desc} />
+          <Skeleton
+            animation={false}
+            variant="rectangular"
+            width={80}
+            height={120}
+            sx={{ mr: 2 }}
+          />
+          <ListItemText
+            primary={shortAddr(slave.self)}
+            secondary={slave.desc}
+          />
         </ListItemButton>
-      </ListItem>
+      </Grid>
     );
   }
 
   return (
-    <Box>
-      <List>{items}</List>
-    </Box>
+    <Grid container spacing={2} padding={1}>
+      {items}
+    </Grid>
   );
 }
