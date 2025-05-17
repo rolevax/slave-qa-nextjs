@@ -1,8 +1,9 @@
 "use client";
 
+import PriceInput from "@/components/PriceInput";
 import SlaveBrief from "@/components/SlaveBrief";
 import { wagmiContractConfig } from "@/contracts";
-import { isZeroAddr, shortAddr } from "@/util";
+import { isZeroAddr, shortAddr, toEther } from "@/util";
 import { ArrowBack, ChatSharp } from "@mui/icons-material";
 import {
   AppBar,
@@ -147,7 +148,7 @@ function ChatList(props: {
           <ListItemText
             primary={`${
               chat.content == "buy" ? "Bought for" : "Set price to"
-            } ${chat.price}`}
+            } ${toEther(chat.price)}`}
             secondary={shortAddr(chat.who)}
           />
         </ListItem>
@@ -209,19 +210,7 @@ function SelfNotSlaveInput(props: { initPrice: bigint }) {
         justifyContent="start"
         alignItems="center"
       >
-        <FormControl sx={{ m: 1 }} variant="standard">
-          <InputLabel htmlFor="standard-adornment-amount">Price</InputLabel>
-          <Input
-            id="standard-adornment-amount"
-            startAdornment={<InputAdornment position="start">$</InputAdornment>}
-            value={price}
-            onChange={(e) => {
-              let s = e.target.value;
-              setPrice(BigInt(s));
-            }}
-            disabled={isPending}
-          />
-        </FormControl>
+        <PriceInput value={price} onChange={setPrice} disabled={isPending} />
         <Button variant="contained" onClick={submit} disabled={isPending}>
           {props.initPrice == BigInt(0) ? "Sell yourself" : "Update Price"}
         </Button>
@@ -283,15 +272,7 @@ function SelfSlaveInput(props: { address: `0x${string}`; price: bigint }) {
         justifyContent="start"
         alignItems="center"
       >
-        <FormControl sx={{ m: 1 }} variant="standard">
-          <InputLabel htmlFor="standard-adornment-amount">Price</InputLabel>
-          <Input
-            id="standard-adornment-amount"
-            startAdornment={<InputAdornment position="start">$</InputAdornment>}
-            value={props.price}
-            disabled={true}
-          />
-        </FormControl>
+        <PriceInput value={props.price} disabled={true} />
         <Button
           variant="contained"
           onClick={buy}
@@ -359,19 +340,7 @@ function OwningInput(props: { address: `0x${string}`; price: bigint }) {
         justifyContent="start"
         alignItems="center"
       >
-        <FormControl sx={{ m: 1 }} variant="standard">
-          <InputLabel htmlFor="standard-adornment-amount">Price</InputLabel>
-          <Input
-            id="standard-adornment-amount"
-            startAdornment={<InputAdornment position="start">$</InputAdornment>}
-            value={price}
-            onChange={(e) => {
-              let s = e.target.value;
-              setPrice(BigInt(s));
-            }}
-            disabled={isPending}
-          />
-        </FormControl>
+        <PriceInput value={price} onChange={setPrice} disabled={isPending} />
         <Button variant="contained" onClick={sell} disabled={isPending}>
           {props.price == BigInt(0) ? "Sell" : "Update Price"}
         </Button>
@@ -424,15 +393,7 @@ function NotOwningInput(props: { address: `0x${string}`; price: bigint }) {
         justifyContent="start"
         alignItems="center"
       >
-        <FormControl sx={{ m: 1 }} variant="standard">
-          <InputLabel htmlFor="standard-adornment-amount">Price</InputLabel>
-          <Input
-            id="standard-adornment-amount"
-            startAdornment={<InputAdornment position="start">$</InputAdornment>}
-            value={props.price}
-            disabled={true}
-          />
-        </FormControl>
+        <PriceInput value={props.price} disabled={true} />
         <Button
           variant="contained"
           onClick={submit}
