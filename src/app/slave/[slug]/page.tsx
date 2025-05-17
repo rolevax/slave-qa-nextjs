@@ -2,7 +2,7 @@
 
 import SlaveBrief from "@/components/SlaveBrief";
 import { wagmiContractConfig } from "@/contracts";
-import { shortAddr } from "@/util";
+import { isZeroAddr, shortAddr } from "@/util";
 import { ArrowBack, ChatSharp } from "@mui/icons-material";
 import {
   AppBar,
@@ -106,10 +106,10 @@ function SlaveBody(props: {
   const slave = props.slave;
   let inputBox;
   if (address == slave.self) {
-    if (slave.master == "0x0000000000000000000000000000000000000000") {
+    if (isZeroAddr(slave.master)) {
       inputBox = <SelfNotSlaveInput initPrice={slave.price} />;
     } else {
-      inputBox = <SelfSlaveInput />;
+      inputBox = <SelfSlaveInput address={slave.self} price={slave.price} />;
     }
   } else {
     if (slave.master == address) {
@@ -170,6 +170,7 @@ function ChatList(props: {
 }
 
 function SelfNotSlaveInput(props: { initPrice: bigint }) {
+  const [content, setContent] = useState("");
   const [price, setPrice] = useState(
     props.initPrice == BigInt(0) ? BigInt(1000000000) : props.initPrice
   );
@@ -180,7 +181,7 @@ function SelfNotSlaveInput(props: { initPrice: bigint }) {
     writeContract({
       ...wagmiContractConfig,
       functionName: "sellSelf",
-      args: [price, "desc"],
+      args: [price, content],
     });
   }
 
@@ -190,6 +191,17 @@ function SelfNotSlaveInput(props: { initPrice: bigint }) {
 
   return (
     <Box>
+      <Typography variant="h6" marginTop={3} marginBottom={1}>
+        To be a slave
+      </Typography>
+      <TextField
+        label="Slave Description"
+        fullWidth
+        sx={{ pb: 1 }}
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        disabled={isPending}
+      />
       <Grid
         container
         spacing={2}
@@ -211,14 +223,14 @@ function SelfNotSlaveInput(props: { initPrice: bigint }) {
           />
         </FormControl>
         <Button variant="contained" onClick={submit} disabled={isPending}>
-          {props.initPrice == BigInt(0) ? "Be a Slave" : "Update Price"}
+          {props.initPrice == BigInt(0) ? "Sell yourself" : "Update Price"}
         </Button>
       </Grid>
     </Box>
   );
 }
 
-function SelfSlaveInput() {
+function SelfSlaveInput(props: { address: `0x${string}`; price: bigint }) {
   const [content, setContent] = useState("");
   const queryClient = useQueryClient();
   const { data: hash, error, isPending, writeContract } = useWriteContract();
@@ -229,6 +241,16 @@ function SelfSlaveInput() {
       functionName: "answerMaster",
       args: [content],
     });
+    setContent("");
+  }
+
+  async function buy() {
+    writeContract({
+      ...wagmiContractConfig,
+      functionName: "buySlave",
+      args: [props.address],
+      value: props.price,
+    });
   }
 
   if (hash) {
@@ -237,6 +259,9 @@ function SelfSlaveInput() {
 
   return (
     <Box>
+      <Typography variant="h6" marginTop={3} marginBottom={1}>
+        Answering to your master
+      </Typography>
       <TextField
         label="Answer"
         fullWidth
@@ -248,6 +273,33 @@ function SelfSlaveInput() {
       <Button variant="contained" onClick={chat} disabled={isPending}>
         Send
       </Button>
+      <Typography variant="h6" marginTop={3} marginBottom={1}>
+        Backing to freedom
+      </Typography>
+      <Grid
+        container
+        spacing={2}
+        direction="row"
+        justifyContent="start"
+        alignItems="center"
+      >
+        <FormControl sx={{ m: 1 }} variant="standard">
+          <InputLabel htmlFor="standard-adornment-amount">Price</InputLabel>
+          <Input
+            id="standard-adornment-amount"
+            startAdornment={<InputAdornment position="start">$</InputAdornment>}
+            value={props.price}
+            disabled={true}
+          />
+        </FormControl>
+        <Button
+          variant="contained"
+          onClick={buy}
+          disabled={isPending || props.price == BigInt(0)}
+        >
+          {props.price > 0 ? "Buy Yourself" : "Not Selling"}
+        </Button>
+      </Grid>
     </Box>
   );
 }
@@ -278,6 +330,7 @@ function OwningInput(props: { address: `0x${string}`; price: bigint }) {
       functionName: "askSlave",
       args: [props.address, content],
     });
+    setContent("");
   }
 
   return (
@@ -380,8 +433,12 @@ function NotOwningInput(props: { address: `0x${string}`; price: bigint }) {
             disabled={true}
           />
         </FormControl>
-        <Button variant="contained" onClick={submit} disabled={isPending}>
-          Buy
+        <Button
+          variant="contained"
+          onClick={submit}
+          disabled={isPending || props.price == BigInt(0)}
+        >
+          {props.price > 0 ? "Buy" : "Not Selling"}
         </Button>
       </Grid>
     </Box>

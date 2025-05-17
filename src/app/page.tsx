@@ -38,7 +38,7 @@ function HomeAppBar() {
           <Menu />
         </IconButton>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Slavenet
+          Slaveum
         </Typography>
         <ConnectButton />
       </Toolbar>
@@ -47,25 +47,8 @@ function HomeAppBar() {
 }
 
 function HomeBody() {
-  const [value, setValue] = useState(0);
   const { address } = useAccount();
-  const {
-    data: slaves,
-    error,
-    isPending,
-  } = useReadContract({
-    ...wagmiContractConfig,
-    functionName: "getSlaves",
-    args: [],
-  });
 
-  let marketSlaves = slaves?.filter((s) => s.price > 0);
-  let mySlaves = slaves?.filter((s) => s.master == address);
-
-  const tabContent = [
-    mySlaves ? <MarketList slaves={mySlaves} /> : <div>loading</div>,
-    marketSlaves ? <MarketList slaves={marketSlaves} /> : <div>loading</div>,
-  ][value];
   let brief = address ? (
     <SlaveBrief slaveAddress={address} showSlavePageButton={true} />
   ) : (
@@ -76,6 +59,36 @@ function HomeBody() {
   return (
     <Box>
       {brief}
+      <SlaveView />
+    </Box>
+  );
+}
+
+function SlaveView() {
+  const { address } = useAccount();
+  const [value, setValue] = useState(0);
+  const {
+    data: slaves,
+    error,
+    isPending,
+  } = useReadContract({
+    ...wagmiContractConfig,
+    functionName: "getSlaves",
+    args: [],
+  });
+
+  if (isPending || !slaves) {
+    return <div>loading</div>;
+  }
+
+  let marketSlaves = slaves?.filter((s) => s.price > 0);
+  let mySlaves = slaves?.filter((s) => s.master == address);
+  const tabContent = [
+    mySlaves ? <MarketList slaves={mySlaves} /> : <div>loading</div>,
+    marketSlaves ? <MarketList slaves={marketSlaves} /> : <div>loading</div>,
+  ][value];
+  return (
+    <Box>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
