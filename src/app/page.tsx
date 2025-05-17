@@ -38,7 +38,7 @@ function HomeAppBar() {
           <Menu />
         </IconButton>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Slave Q&A
+          Slavenet
         </Typography>
         <ConnectButton />
       </Toolbar>
