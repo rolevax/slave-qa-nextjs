@@ -1,6 +1,6 @@
 import { Box, Button, Skeleton, Typography } from "@mui/material";
 
-export default function SlaveBrief(props: { showSlavePageButton: boolean }) {
+export default function SlaveBrief(props: { slaveName: string, showSlavePageButton: boolean }) {
   return (
     <Box
       display="flex"
@@ -17,7 +17,7 @@ export default function SlaveBrief(props: { showSlavePageButton: boolean }) {
         sx={{ mr: 4 }}
       />
       <Box flexDirection="column">
-        <Typography variant="h5">my info</Typography>
+        <Typography variant="h5">{props.slaveName}</Typography>
         <Typography color="secondary">my info</Typography>
         <Typography color="secondary">Master: 0x11...4514</Typography>
         <Typography color="secondary">Slaves: 5</Typography>

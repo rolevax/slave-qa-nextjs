@@ -63,7 +63,7 @@ function SlaveAppBar() {
 function SlaveBody() {
   return (
     <Box>
-      <SlaveBrief showSlavePageButton={false} />
+      <SlaveBrief slaveName="0x11...4514" showSlavePageButton={false} />
       <ChatList />
       <OwningInput />
       <Box minHeight={200} />
@@ -98,18 +98,18 @@ function SelfNotSlaveInput() {
           <Input
             id="standard-adornment-amount"
             startAdornment={<InputAdornment position="start">$</InputAdornment>}
-            // value={props.price}
-            // onChange={(e) => {
-            //   let s = e.target.value;
-            //   props.onPriceChanged?.(BigInt(s));
-            // }}
-            // disabled={!props.onPriceChanged}
+          // value={props.price}
+          // onChange={(e) => {
+          //   let s = e.target.value;
+          //   props.onPriceChanged?.(BigInt(s));
+          // }}
+          // disabled={!props.onPriceChanged}
           />
         </FormControl>
         <Button
           variant="contained"
           type="submit"
-          // disabled={props.isPending}
+        // disabled={props.isPending}
         >
           Be a Slave
         </Button>
@@ -125,10 +125,10 @@ function SelfSlaveInput() {
         label="Answer"
         fullWidth
         sx={{ pb: 1 }}
-        // rows={2}
-        // value={props.content}
-        // onChange={(e) => props.onContentChanged?.(e.target.value)}
-        // disabled={!props.onContentChanged}
+      // rows={2}
+      // value={props.content}
+      // onChange={(e) => props.onContentChanged?.(e.target.value)}
+      // disabled={!props.onContentChanged}
       />
       <Button variant="contained">Send</Button>
     </Box>
@@ -145,10 +145,10 @@ function OwningInput() {
         label="Question"
         fullWidth
         sx={{ pb: 1 }}
-        // rows={2}
-        // value={props.content}
-        // onChange={(e) => props.onContentChanged?.(e.target.value)}
-        // disabled={!props.onContentChanged}
+      // rows={2}
+      // value={props.content}
+      // onChange={(e) => props.onContentChanged?.(e.target.value)}
+      // disabled={!props.onContentChanged}
       />
       <Button variant="contained">Send</Button>
       <Typography variant="h6" marginTop={3} marginBottom={1}>
@@ -166,18 +166,18 @@ function OwningInput() {
           <Input
             id="standard-adornment-amount"
             startAdornment={<InputAdornment position="start">$</InputAdornment>}
-            // value={props.price}
-            // onChange={(e) => {
-            //   let s = e.target.value;
-            //   props.onPriceChanged?.(BigInt(s));
-            // }}
-            // disabled={!props.onPriceChanged}
+          // value={props.price}
+          // onChange={(e) => {
+          //   let s = e.target.value;
+          //   props.onPriceChanged?.(BigInt(s));
+          // }}
+          // disabled={!props.onPriceChanged}
           />
         </FormControl>
         <Button
           variant="contained"
           type="submit"
-          // disabled={props.isPending}
+        // disabled={props.isPending}
         >
           Sell
         </Button>
@@ -230,7 +230,7 @@ function NotOwningInput() {
         <Button
           variant="contained"
           type="submit"
-          // disabled={props.isPending}
+        // disabled={props.isPending}
         >
           Buy
         </Button>

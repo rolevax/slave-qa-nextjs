@@ -51,7 +51,7 @@ function HomeBody() {
   const tabContent = [<MarketList />, <MarketList />][value];
   return (
     <Box>
-      <SlaveBrief showSlavePageButton={true} />
+      <SlaveBrief slaveName="0x11...4514" showSlavePageButton={true} />
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
