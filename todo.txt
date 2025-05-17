@@ -1,4 +1,0 @@
-market list -> grid view
-
-self slave input: buy self back
-check: cannot buy not-selling slave
