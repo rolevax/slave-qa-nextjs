@@ -3,7 +3,7 @@
 import SlaveBrief from "@/components/SlaveBrief";
 import { wagmiContractConfig } from "@/contracts";
 import { shortAddr } from "@/util";
-import { ArrowBack } from "@mui/icons-material";
+import { ArrowBack, ChatSharp } from "@mui/icons-material";
 import {
   AppBar,
   Box,
@@ -17,6 +17,7 @@ import {
   InputLabel,
   List,
   ListItem,
+  ListItemAvatar,
   ListItemText,
   TextField,
   Toolbar,
@@ -112,7 +113,7 @@ function SlaveBody(props: {
     }
   } else {
     if (slave.master == address) {
-      inputBox = <OwningInput />;
+      inputBox = <OwningInput address={slave.self} price={slave.price} />;
     } else {
       inputBox = <NotOwningInput address={slave.self} price={slave.price} />;
     }
@@ -121,21 +122,49 @@ function SlaveBody(props: {
   return (
     <Box>
       <SlaveBrief slaveAddress={slave.self} showSlavePageButton={false} />
-      <ChatList />
+      <ChatList chats={slave.chats} user={address} />
       {inputBox}
       <Box minHeight={200} />
     </Box>
   );
 }
 
-function ChatList() {
+function ChatList(props: {
+  chats: readonly {
+    who: `0x${string}`;
+    content: string;
+    price: bigint;
+  }[];
+  user: `0x${string}` | undefined;
+}) {
   let items = [];
-  for (let i = 0; i < 10; i++) {
-    items.push(
-      <ListItem key={i}>
-        <ListItemText primary="bla bla bla" secondary="0x11..4514" />
-      </ListItem>
-    );
+  for (let i = 0; i < props.chats.length; i++) {
+    let chat = props.chats[i];
+    let item;
+    if (chat.price > 0) {
+      item = (
+        <ListItem key={i}>
+          <ListItemText
+            primary={`${
+              chat.content == "buy" ? "Bought for" : "Set price to"
+            } ${chat.price}`}
+            secondary={shortAddr(chat.who)}
+          />
+        </ListItem>
+      );
+    } else {
+      item = (
+        <ListItem key={i}>
+          <ListItemAvatar>{chat.who.substring(0, 4)}</ListItemAvatar>
+          <ListItemText
+            primary={chat.content}
+            secondary={shortAddr(chat.who)}
+          />
+        </ListItem>
+      );
+    }
+
+    items.push(item);
   }
   return <List>{items}</List>;
 }
@@ -206,7 +235,30 @@ function SelfSlaveInput() {
   );
 }
 
-function OwningInput() {
+function OwningInput(props: { address: `0x${string}`; price: bigint }) {
+  const [content, setContent] = useState("");
+  const [price, setPrice] = useState(
+    props.price == BigInt(0) ? BigInt(1000000000) : props.price
+  );
+  const queryClient = useQueryClient();
+  const { data: hash, error, isPending, writeContract } = useWriteContract();
+
+  async function sell() {
+    writeContract({
+      ...wagmiContractConfig,
+      functionName: "sellSlave",
+      args: [props.address, price],
+    });
+  }
+
+  async function chat() {
+    writeContract({
+      ...wagmiContractConfig,
+      functionName: "askSlave",
+      args: [props.address, content],
+    });
+  }
+
   return (
     <Box>
       <Typography variant="h6" marginTop={3} marginBottom={1}>
@@ -216,12 +268,13 @@ function OwningInput() {
         label="Question"
         fullWidth
         sx={{ pb: 1 }}
-        // rows={2}
-        // value={props.content}
-        // onChange={(e) => props.onContentChanged?.(e.target.value)}
-        // disabled={!props.onContentChanged}
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        disabled={isPending}
       />
-      <Button variant="contained">Send</Button>
+      <Button variant="contained" onClick={chat} disabled={isPending}>
+        Send
+      </Button>
       <Typography variant="h6" marginTop={3} marginBottom={1}>
         Selling
       </Typography>
@@ -237,20 +290,16 @@ function OwningInput() {
           <Input
             id="standard-adornment-amount"
             startAdornment={<InputAdornment position="start">$</InputAdornment>}
-            // value={props.price}
-            // onChange={(e) => {
-            //   let s = e.target.value;
-            //   props.onPriceChanged?.(BigInt(s));
-            // }}
-            // disabled={!props.onPriceChanged}
+            value={price}
+            onChange={(e) => {
+              let s = e.target.value;
+              setPrice(BigInt(s));
+            }}
+            disabled={isPending}
           />
         </FormControl>
-        <Button
-          variant="contained"
-          type="submit"
-          // disabled={props.isPending}
-        >
-          Sell
+        <Button variant="contained" onClick={sell} disabled={isPending}>
+          {props.price == BigInt(0) ? "Sell" : "Update Price"}
         </Button>
       </Grid>
     </Box>
