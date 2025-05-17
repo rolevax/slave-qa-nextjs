@@ -9,6 +9,7 @@ import { Menu } from "@mui/icons-material";
 import SlaveBrief from "../components/SlaveBrief";
 import MarketList from "@/components/MarketList";
 import { useState } from "react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export default function Home() {
   return (
@@ -37,10 +38,7 @@ function HomeAppBar() {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Slave Q&A
         </Typography>
-        <Button component={NextLink} href="/about">
-          About
-        </Button>
-        {/* <ConnectButton /> */}
+        <ConnectButton />
       </Toolbar>
     </AppBar>
   );

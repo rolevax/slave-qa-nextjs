@@ -20,6 +20,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Butterfly_Kids } from "next/font/google";
 import { usePathname } from "next/navigation";
 
@@ -54,7 +55,7 @@ function SlaveAppBar() {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Slave
         </Typography>
-        {/* <ConnectButton /> */}
+        <ConnectButton />
       </Toolbar>
     </AppBar>
   );
