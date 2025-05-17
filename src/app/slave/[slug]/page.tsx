@@ -23,13 +23,17 @@ import {
   Typography,
 } from "@mui/material";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useQueryClient } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Address, NonceTooHighError } from "viem";
-import { useAccount, useReadContract } from "wagmi";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
 
 export default function Slave() {
   const pathname = usePathname();
-  let slaveAddress = pathname.substring(pathname.lastIndexOf("/") + 1) as Address;
+  let slaveAddress = pathname.substring(
+    pathname.lastIndexOf("/") + 1
+  ) as Address;
 
   const {
     data: slave,
@@ -74,7 +78,7 @@ function SlaveAppBar(props: { slaveAddress: Address }) {
           <ArrowBack />
         </IconButton>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Slave {props.slaveAddress.toWellFormed()}
+          Slave {shortAddr(props.slaveAddress)}
         </Typography>
         <ConnectButton />
       </Toolbar>
@@ -94,15 +98,15 @@ function SlaveBody(props: {
       content: string;
       price: bigint;
     }[];
-  }
+  };
 }) {
   const { address } = useAccount();
 
   const slave = props.slave;
   let inputBox;
   if (address == slave.self) {
-    if (slave.master == '0x0000000000000000000000000000000000000000') {
-      inputBox = <SelfNotSlaveInput />;
+    if (slave.master == "0x0000000000000000000000000000000000000000") {
+      inputBox = <SelfNotSlaveInput initPrice={slave.price} />;
     } else {
       inputBox = <SelfSlaveInput />;
     }
@@ -136,7 +140,25 @@ function ChatList() {
   return <List>{items}</List>;
 }
 
-function SelfNotSlaveInput() {
+function SelfNotSlaveInput(props: { initPrice: bigint }) {
+  const [price, setPrice] = useState(
+    props.initPrice == BigInt(0) ? BigInt(1000000000) : props.initPrice
+  );
+  const queryClient = useQueryClient();
+  const { data: hash, error, isPending, writeContract } = useWriteContract();
+
+  async function submit() {
+    writeContract({
+      ...wagmiContractConfig,
+      functionName: "sellSelf",
+      args: [price, "desc"],
+    });
+  }
+
+  if (hash) {
+    queryClient.invalidateQueries();
+  }
+
   return (
     <Box>
       <Grid
@@ -151,20 +173,16 @@ function SelfNotSlaveInput() {
           <Input
             id="standard-adornment-amount"
             startAdornment={<InputAdornment position="start">$</InputAdornment>}
-          // value={props.price}
-          // onChange={(e) => {
-          //   let s = e.target.value;
-          //   props.onPriceChanged?.(BigInt(s));
-          // }}
-          // disabled={!props.onPriceChanged}
+            value={price}
+            onChange={(e) => {
+              let s = e.target.value;
+              setPrice(BigInt(s));
+            }}
+            disabled={isPending}
           />
         </FormControl>
-        <Button
-          variant="contained"
-          type="submit"
-        // disabled={props.isPending}
-        >
-          Be a Slave
+        <Button variant="contained" onClick={submit} disabled={isPending}>
+          {props.initPrice == BigInt(0) ? "Be a Slave" : "Update Price"}
         </Button>
       </Grid>
     </Box>
@@ -178,10 +196,10 @@ function SelfSlaveInput() {
         label="Answer"
         fullWidth
         sx={{ pb: 1 }}
-      // rows={2}
-      // value={props.content}
-      // onChange={(e) => props.onContentChanged?.(e.target.value)}
-      // disabled={!props.onContentChanged}
+        // rows={2}
+        // value={props.content}
+        // onChange={(e) => props.onContentChanged?.(e.target.value)}
+        // disabled={!props.onContentChanged}
       />
       <Button variant="contained">Send</Button>
     </Box>
@@ -198,10 +216,10 @@ function OwningInput() {
         label="Question"
         fullWidth
         sx={{ pb: 1 }}
-      // rows={2}
-      // value={props.content}
-      // onChange={(e) => props.onContentChanged?.(e.target.value)}
-      // disabled={!props.onContentChanged}
+        // rows={2}
+        // value={props.content}
+        // onChange={(e) => props.onContentChanged?.(e.target.value)}
+        // disabled={!props.onContentChanged}
       />
       <Button variant="contained">Send</Button>
       <Typography variant="h6" marginTop={3} marginBottom={1}>
@@ -219,18 +237,18 @@ function OwningInput() {
           <Input
             id="standard-adornment-amount"
             startAdornment={<InputAdornment position="start">$</InputAdornment>}
-          // value={props.price}
-          // onChange={(e) => {
-          //   let s = e.target.value;
-          //   props.onPriceChanged?.(BigInt(s));
-          // }}
-          // disabled={!props.onPriceChanged}
+            // value={props.price}
+            // onChange={(e) => {
+            //   let s = e.target.value;
+            //   props.onPriceChanged?.(BigInt(s));
+            // }}
+            // disabled={!props.onPriceChanged}
           />
         </FormControl>
         <Button
           variant="contained"
           type="submit"
-        // disabled={props.isPending}
+          // disabled={props.isPending}
         >
           Sell
         </Button>
@@ -283,7 +301,7 @@ function NotOwningInput() {
         <Button
           variant="contained"
           type="submit"
-        // disabled={props.isPending}
+          // disabled={props.isPending}
         >
           Buy
         </Button>
