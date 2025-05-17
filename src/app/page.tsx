@@ -3,13 +3,14 @@
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import NextLink from "next/link";
 import { AppBar, Button, IconButton, Tab, Tabs, Toolbar } from "@mui/material";
 import { Menu } from "@mui/icons-material";
 import SlaveBrief from "../components/SlaveBrief";
 import MarketList from "@/components/MarketList";
 import { useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
+import { shortAddr } from "@/util";
 
 export default function Home() {
   return (
@@ -46,10 +47,15 @@ function HomeAppBar() {
 
 function HomeBody() {
   const [value, setValue] = useState(0);
+  const { address } = useAccount();
+
   const tabContent = [<MarketList />, <MarketList />][value];
+  let brief = address ?
+    <SlaveBrief slaveAddress={address} showSlavePageButton={true} />
+    : <Typography>Please Connect</Typography>
   return (
     <Box>
-      <SlaveBrief slaveName="0x11...4514" showSlavePageButton={true} />
+      {brief}
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}

@@ -1,6 +1,7 @@
 "use client";
 
 import SlaveBrief from "@/components/SlaveBrief";
+import { wagmiContractConfig } from "@/contracts";
 import { ArrowBack } from "@mui/icons-material";
 import {
   AppBar,
@@ -23,22 +24,39 @@ import {
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Butterfly_Kids } from "next/font/google";
 import { usePathname } from "next/navigation";
+import { Address } from "viem";
+import { useAccount, useReadContract } from "wagmi";
 
 export default function Slave() {
   const pathname = usePathname();
-  let storyID = pathname.substring(pathname.lastIndexOf("/") + 1);
+  let slaveAddress = pathname.substring(pathname.lastIndexOf("/") + 1) as Address;
+
+  const {
+    data: slave,
+    error,
+    isPending,
+  } = useReadContract({
+    ...wagmiContractConfig,
+    functionName: "getOrDefault",
+    args: [slaveAddress],
+  });
+  const { address } = useAccount();
+
+  if (isPending) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Container maxWidth="lg">
       <Box sx={{ width: "100%", flexGrow: 1 }}>
-        <SlaveAppBar />
+        <SlaveAppBar slaveAddress={slaveAddress} />
         <SlaveBody />
       </Box>
     </Container>
   );
 }
 
-function SlaveAppBar() {
+function SlaveAppBar(props: { slaveAddress: Address }) {
   return (
     <AppBar position="sticky">
       <Toolbar>
@@ -53,7 +71,7 @@ function SlaveAppBar() {
           <ArrowBack />
         </IconButton>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Slave
+          Slave {props.slaveAddress.toWellFormed()}
         </Typography>
         <ConnectButton />
       </Toolbar>
@@ -64,7 +82,7 @@ function SlaveAppBar() {
 function SlaveBody() {
   return (
     <Box>
-      <SlaveBrief slaveName="0x11...4514" showSlavePageButton={false} />
+      <SlaveBrief slaveAddress="0x11...4514" showSlavePageButton={false} />
       <ChatList />
       <OwningInput />
       <Box minHeight={200} />

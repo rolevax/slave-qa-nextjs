@@ -1,6 +1,9 @@
+"use client";
+
+import { shortAddr } from "@/util";
 import { Box, Button, Skeleton, Typography } from "@mui/material";
 
-export default function SlaveBrief(props: { slaveName: string, showSlavePageButton: boolean }) {
+export default function SlaveBrief(props: { slaveAddress: `0x${string}`, showSlavePageButton: boolean }) {
   return (
     <Box
       display="flex"
@@ -17,12 +20,12 @@ export default function SlaveBrief(props: { slaveName: string, showSlavePageButt
         sx={{ mr: 4 }}
       />
       <Box flexDirection="column">
-        <Typography variant="h5">{props.slaveName}</Typography>
+        <Typography variant="h5">{shortAddr(props.slaveAddress)}</Typography>
         <Typography color="secondary">my info</Typography>
         <Typography color="secondary">Master: 0x11...4514</Typography>
         <Typography color="secondary">Slaves: 5</Typography>
         {props.showSlavePageButton && (
-          <Button variant="contained">Slave Page</Button>
+          <Button variant="contained" href={`/slave/${props.slaveAddress}`}>Slave Page</Button>
         )}
       </Box>
     </Box>
