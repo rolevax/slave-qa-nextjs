@@ -2,6 +2,7 @@
 
 import SlaveBrief from "@/components/SlaveBrief";
 import { wagmiContractConfig } from "@/contracts";
+import { shortAddr } from "@/util";
 import { ArrowBack } from "@mui/icons-material";
 import {
   AppBar,
@@ -22,7 +23,6 @@ import {
   Typography,
 } from "@mui/material";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Butterfly_Kids } from "next/font/google";
 import { usePathname } from "next/navigation";
 import { Address } from "viem";
 import { useAccount, useReadContract } from "wagmi";
@@ -46,11 +46,15 @@ export default function Slave() {
     return <div>Loading...</div>;
   }
 
+  if (!slave) {
+    return <div>Slave Not Found</div>;
+  }
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ width: "100%", flexGrow: 1 }}>
         <SlaveAppBar slaveAddress={slaveAddress} />
-        <SlaveBody />
+        <SlaveBody slave={slave} />
       </Box>
     </Container>
   );
@@ -79,10 +83,23 @@ function SlaveAppBar(props: { slaveAddress: Address }) {
   );
 }
 
-function SlaveBody() {
+function SlaveBody(props: {
+  slave: {
+    self: `0x${string}`;
+    desc: string;
+    price: bigint;
+    master: `0x${string}`;
+    slaves: readonly `0x${string}`[];
+    chats: readonly {
+      who: `0x${string}`;
+      content: string;
+      price: bigint;
+    }[];
+  }
+}) {
   return (
     <Box>
-      <SlaveBrief slaveAddress="0x11...4514" showSlavePageButton={false} />
+      <SlaveBrief slaveAddress={props.slave.self} showSlavePageButton={false} />
       <ChatList />
       <OwningInput />
       <Box minHeight={200} />
