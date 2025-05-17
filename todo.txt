@@ -1,1 +1,3 @@
 market list -> grid view
+
+self slave input: buy self back

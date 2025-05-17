@@ -114,7 +114,7 @@ function SlaveBody(props: {
     if (slave.master == address) {
       inputBox = <OwningInput />;
     } else {
-      inputBox = <NotOwningInput />;
+      inputBox = <NotOwningInput address={slave.self} price={slave.price} />;
     }
   }
 
@@ -257,19 +257,35 @@ function OwningInput() {
   );
 }
 
-function NotOwningInput() {
+function NotOwningInput(props: { address: `0x${string}`; price: bigint }) {
+  const [content, setContent] = useState("");
+  const queryClient = useQueryClient();
+  const { data: hash, error, isPending, writeContract } = useWriteContract();
+
+  async function submit() {
+    writeContract({
+      ...wagmiContractConfig,
+      functionName: "buySlave",
+      value: props.price,
+      args: [props.address],
+    });
+  }
+
+  if (hash) {
+    queryClient.invalidateQueries();
+  }
+
   return (
     <Box>
       <Typography variant="h6" marginTop={3} marginBottom={1}>
         Asking
       </Typography>
       <TextField
-        label="Question"
         fullWidth
         sx={{ pb: 1 }}
-        // rows={2}
-        // value={props.content}
-        // onChange={(e) => props.onContentChanged?.(e.target.value)}
+        value={content}
+        placeholder="Buy to send message"
+        onChange={(e) => setContent(e.target.value)}
         disabled={true}
       />
       <Button variant="contained" disabled={true}>
@@ -290,19 +306,11 @@ function NotOwningInput() {
           <Input
             id="standard-adornment-amount"
             startAdornment={<InputAdornment position="start">$</InputAdornment>}
-            // value={props.price}
-            // onChange={(e) => {
-            //   let s = e.target.value;
-            //   props.onPriceChanged?.(BigInt(s));
-            // }}
+            value={props.price}
             disabled={true}
           />
         </FormControl>
-        <Button
-          variant="contained"
-          type="submit"
-          // disabled={props.isPending}
-        >
+        <Button variant="contained" onClick={submit} disabled={isPending}>
           Buy
         </Button>
       </Grid>
