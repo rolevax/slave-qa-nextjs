@@ -24,7 +24,7 @@ import {
 } from "@mui/material";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { usePathname } from "next/navigation";
-import { Address } from "viem";
+import { Address, NonceTooHighError } from "viem";
 import { useAccount, useReadContract } from "wagmi";
 
 export default function Slave() {
@@ -40,7 +40,6 @@ export default function Slave() {
     functionName: "getOrDefault",
     args: [slaveAddress],
   });
-  const { address } = useAccount();
 
   if (isPending) {
     return <div>Loading...</div>;
@@ -97,11 +96,29 @@ function SlaveBody(props: {
     }[];
   }
 }) {
+  const { address } = useAccount();
+
+  const slave = props.slave;
+  let inputBox;
+  if (address == slave.self) {
+    if (slave.master == '0x0000000000000000000000000000000000000000') {
+      inputBox = <SelfNotSlaveInput />;
+    } else {
+      inputBox = <SelfSlaveInput />;
+    }
+  } else {
+    if (slave.master == address) {
+      inputBox = <OwningInput />;
+    } else {
+      inputBox = <NotOwningInput />;
+    }
+  }
+
   return (
     <Box>
-      <SlaveBrief slaveAddress={props.slave.self} showSlavePageButton={false} />
+      <SlaveBrief slaveAddress={slave.self} showSlavePageButton={false} />
       <ChatList />
-      <OwningInput />
+      {inputBox}
       <Box minHeight={200} />
     </Box>
   );
