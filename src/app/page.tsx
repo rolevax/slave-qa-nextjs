@@ -9,8 +9,9 @@ import SlaveBrief from "../components/SlaveBrief";
 import MarketList from "@/components/MarketList";
 import { useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
+import { useAccount, useReadContract } from "wagmi";
 import { shortAddr } from "@/util";
+import { wagmiContractConfig } from "@/contracts";
 
 export default function Home() {
   return (
@@ -48,8 +49,23 @@ function HomeAppBar() {
 function HomeBody() {
   const [value, setValue] = useState(0);
   const { address } = useAccount();
+  const {
+    data: slaves,
+    error,
+    isPending,
+  } = useReadContract({
+    ...wagmiContractConfig,
+    functionName: "getSlaves",
+    args: [],
+  });
 
-  const tabContent = [<MarketList />, <MarketList />][value];
+  let marketSlaves = slaves?.filter((s) => s.price > 0);
+  let mySlaves = slaves?.filter((s) => s.master == address);
+
+  const tabContent = [
+    mySlaves ? <MarketList slaves={mySlaves} /> : <div>loading</div>,
+    marketSlaves ? <MarketList slaves={marketSlaves} /> : <div>loading</div>,
+  ][value];
   let brief = address ?
     <SlaveBrief slaveAddress={address} showSlavePageButton={true} />
     : <Typography>Please Connect</Typography>

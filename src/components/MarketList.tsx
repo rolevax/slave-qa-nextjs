@@ -1,3 +1,4 @@
+import { shortAddr } from "@/util";
 import {
   Box,
   List,
@@ -8,14 +9,27 @@ import {
   Typography,
 } from "@mui/material";
 
-export default function MarketList() {
+export default function MarketList(props: {
+  slaves: {
+    self: `0x${string}`;
+    desc: string;
+    price: bigint;
+    master: `0x${string}`;
+    slaves: readonly `0x${string}`[];
+    chats: readonly {
+      who: `0x${string}`;
+      content: string;
+      price: bigint;
+    }[];
+  }[]
+}) {
   let items = [];
-  for (let i = 0; i < 10; i++) {
+  for (let slave of props.slaves) {
     items.push(
-      <ListItem key={i}>
-        <ListItemButton href={`/slave/${i}`}>
+      <ListItem key={slave.self}>
+        <ListItemButton href={`/slave/${slave.self}`}>
           <ListItemAvatar>N</ListItemAvatar>
-          <ListItemText primary="pppp" secondary="sss ss sss" />
+          <ListItemText primary={shortAddr(slave.self)} secondary={slave.desc} />
         </ListItemButton>
       </ListItem>
     );
