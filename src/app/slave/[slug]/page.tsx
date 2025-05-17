@@ -219,18 +219,35 @@ function SelfNotSlaveInput(props: { initPrice: bigint }) {
 }
 
 function SelfSlaveInput() {
+  const [content, setContent] = useState("");
+  const queryClient = useQueryClient();
+  const { data: hash, error, isPending, writeContract } = useWriteContract();
+
+  async function chat() {
+    writeContract({
+      ...wagmiContractConfig,
+      functionName: "answerMaster",
+      args: [content],
+    });
+  }
+
+  if (hash) {
+    queryClient.invalidateQueries();
+  }
+
   return (
     <Box>
       <TextField
         label="Answer"
         fullWidth
         sx={{ pb: 1 }}
-        // rows={2}
-        // value={props.content}
-        // onChange={(e) => props.onContentChanged?.(e.target.value)}
-        // disabled={!props.onContentChanged}
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        disabled={isPending}
       />
-      <Button variant="contained">Send</Button>
+      <Button variant="contained" onClick={chat} disabled={isPending}>
+        Send
+      </Button>
     </Box>
   );
 }
@@ -242,6 +259,10 @@ function OwningInput(props: { address: `0x${string}`; price: bigint }) {
   );
   const queryClient = useQueryClient();
   const { data: hash, error, isPending, writeContract } = useWriteContract();
+
+  if (hash) {
+    queryClient.invalidateQueries();
+  }
 
   async function sell() {
     writeContract({

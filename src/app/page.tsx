@@ -66,9 +66,13 @@ function HomeBody() {
     mySlaves ? <MarketList slaves={mySlaves} /> : <div>loading</div>,
     marketSlaves ? <MarketList slaves={marketSlaves} /> : <div>loading</div>,
   ][value];
-  let brief = address ?
+  let brief = address ? (
     <SlaveBrief slaveAddress={address} showSlavePageButton={true} />
-    : <Typography>Please Connect</Typography>
+  ) : (
+    <Typography align="center" variant="h6" marginTop={4} marginBottom={2}>
+      Please Connect
+    </Typography>
+  );
   return (
     <Box>
       {brief}
