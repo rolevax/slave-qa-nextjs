@@ -1,4 +1,4 @@
-# Slave Q&A Frontend
+# Slaveum Frontend
 
 ## Run
 
